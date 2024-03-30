@@ -1,0 +1,6 @@
+{
+	"name": "irsqlserverop",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}
