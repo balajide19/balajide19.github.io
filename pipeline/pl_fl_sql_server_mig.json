@@ -1,0 +1,9 @@
+{
+	"name": "pl_fl_sql_server_mig",
+	"properties": {
+		"folder": {
+			"name": "PL_Onprem_Sql_Server"
+		},
+		"annotations": []
+	}
+}
