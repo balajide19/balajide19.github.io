@@ -1,6 +1,9 @@
 {
 	"name": "irsqlserverop",
 	"properties": {
-		"type": "SelfHosted"
+		"type": "SelfHosted",
+		"typeProperties": {
+			"selfContainedInteractiveAuthoringEnabled": true
+		}
 	}
 }
