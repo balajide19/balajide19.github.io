@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "MySqlSource",
-						"query": "SELECT \n    table_schema AS `Schema`,\n    table_name AS `Table`\nFROM \n    information_schema.tables\nWHERE \n    table_type = 'BASE TABLE' \n    AND table_schema NOT IN ('information_schema', 'mysql', 'performance_schema', 'sys')\nORDER BY \n    table_schema, table_name;"
+						"query": "SELECT \n    table_schema AS `Schema`,\n    table_name AS `Table`\nFROM \n    information_schema.tables\nWHERE \n    table_type = 'BASE TABLE' \n    AND table_schema = 'walmart';"
 					},
 					"dataset": {
 						"referenceName": "ds_mysql",
