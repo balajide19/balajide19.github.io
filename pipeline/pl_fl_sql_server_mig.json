@@ -1,6 +1,32 @@
 {
 	"name": "pl_fl_sql_server_mig",
 	"properties": {
+		"activities": [
+			{
+				"name": "lkp_mysql_tables",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT \n    table_schema AS `Schema`,\n    table_name AS `Table`\nFROM \n    information_schema.tables\nWHERE \n    table_type = 'BASE TABLE' \n    AND table_schema NOT IN ('information_schema', 'mysql', 'performance_schema', 'sys')\nORDER BY \n    table_schema, table_name;"
+					},
+					"dataset": {
+						"referenceName": "ds_mysql",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			}
+		],
 		"folder": {
 			"name": "PL_Onprem_Sql_Server"
 		},
