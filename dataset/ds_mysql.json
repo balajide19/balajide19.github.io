@@ -5,6 +5,14 @@
 			"referenceName": "ls_mysql",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"schema": {
+				"type": "string"
+			},
+			"table": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "MySqlTable",
 		"schema": []
