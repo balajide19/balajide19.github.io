@@ -59,7 +59,11 @@
 							"userProperties": [],
 							"typeProperties": {
 								"source": {
-									"type": "MySqlSource"
+									"type": "MySqlSource",
+									"query": {
+										"value": "@{concat('select * from ',item().schema,'.',item().table)}",
+										"type": "Expression"
+									}
 								},
 								"sink": {
 									"type": "ParquetSink",
