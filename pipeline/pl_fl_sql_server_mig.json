@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "MySqlSource",
-						"query": "SELECT \n    table_schema AS `Schema`,\n    table_name AS `Table`\nFROM \n    information_schema.tables\nWHERE \n    table_type = 'BASE TABLE' \n    AND table_schema = 'walmart';"
+						"query": "SELECT \n    table_schema AS `schema`,\n    table_name AS `table`\nFROM \n    information_schema.tables\nWHERE \n    table_type = 'BASE TABLE' \n    AND table_schema = 'walmart';"
 					},
 					"dataset": {
 						"referenceName": "ds_myS",
@@ -27,13 +27,13 @@
 				}
 			},
 			{
-				"name": "ForEachTable",
+				"name": "ForEachTables",
 				"type": "ForEach",
 				"dependsOn": [
 					{
 						"activity": "lkp_mysql_tables",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -46,7 +46,7 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "copytables",
+							"name": "CopyTable",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -64,8 +64,7 @@
 								"sink": {
 									"type": "ParquetSink",
 									"storeSettings": {
-										"type": "AzureBlobFSWriteSettings",
-										"copyBehavior": "FlattenHierarchy"
+										"type": "AzureBlobFSWriteSettings"
 									},
 									"formatSettings": {
 										"type": "ParquetWriteSettings"
