@@ -1,17 +1,9 @@
 {
-	"name": "ds_mysql",
+	"name": "ds_myS",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_lkp_MySql",
 			"type": "LinkedServiceReference"
-		},
-		"parameters": {
-			"schema": {
-				"type": "string"
-			},
-			"table": {
-				"type": "string"
-			}
 		},
 		"annotations": [],
 		"type": "MySqlTable",
