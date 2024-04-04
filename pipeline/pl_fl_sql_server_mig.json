@@ -139,6 +139,13 @@
 							"typeProperties": {
 								"storedProcedureName": "[dbo].[SP_Execution_Details]",
 								"storedProcedureParameters": {
+									"date": {
+										"value": {
+											"value": "@convertTimeZone(utcnow(), 'UTC', 'India Standard Time')",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
 									"error_message": {
 										"value": null,
 										"type": "String"
@@ -158,12 +165,12 @@
 										"type": "Int32"
 									},
 									"pl_status": {
-										"value": "Success",
+										"value": "SUCCESS",
 										"type": "String"
 									},
 									"rows_copied": {
 										"value": {
-											"value": "@activity('CopyTables').output.Copied",
+											"value": "@activity('CopyTables').output.rowsCopied",
 											"type": "Expression"
 										},
 										"type": "Int32"
