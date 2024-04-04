@@ -1,0 +1,147 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adfdevgea"
+		},
+		"ls_adls_landing_mysql_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ls_adls_landing_mysql'"
+		},
+		"ls_lkp_MySql_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ls_lkp_MySql'"
+		},
+		"ls_mysql_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ls_mysql'"
+		},
+		"ls_sp_mysql_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ls_sp_mysql'"
+		},
+		"ls_ss_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_ss'"
+		},
+		"ls_adls_landing_mysql_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://sgdevgen2gea.dfs.core.windows.net/"
+		},
+		"ls_lkp_MySql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "localhost"
+		},
+		"ls_lkp_MySql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "walmart"
+		},
+		"ls_lkp_MySql_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "515137495"
+		},
+		"ls_mysql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "localhost"
+		},
+		"ls_mysql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "walmart"
+		},
+		"ls_mysql_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "515137495"
+		},
+		"ls_sp_mysql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "localhost"
+		},
+		"ls_sp_mysql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "walmart"
+		},
+		"ls_sp_mysql_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "515137495"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "adfdevgea_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"ls_adls_landing_mysql_accountKey": {
+						"value": "[parameters('ls_adls_landing_mysql_accountKey')]"
+					},
+					"ls_lkp_MySql_password": {
+						"value": "[parameters('ls_lkp_MySql_password')]"
+					},
+					"ls_mysql_password": {
+						"value": "[parameters('ls_mysql_password')]"
+					},
+					"ls_sp_mysql_password": {
+						"value": "[parameters('ls_sp_mysql_password')]"
+					},
+					"ls_ss_connectionString": {
+						"value": "[parameters('ls_ss_connectionString')]"
+					},
+					"ls_adls_landing_mysql_properties_typeProperties_url": {
+						"value": "[parameters('ls_adls_landing_mysql_properties_typeProperties_url')]"
+					},
+					"ls_lkp_MySql_properties_typeProperties_server": {
+						"value": "[parameters('ls_lkp_MySql_properties_typeProperties_server')]"
+					},
+					"ls_lkp_MySql_properties_typeProperties_database": {
+						"value": "[parameters('ls_lkp_MySql_properties_typeProperties_database')]"
+					},
+					"ls_lkp_MySql_properties_typeProperties_username": {
+						"value": "[parameters('ls_lkp_MySql_properties_typeProperties_username')]"
+					},
+					"ls_mysql_properties_typeProperties_server": {
+						"value": "[parameters('ls_mysql_properties_typeProperties_server')]"
+					},
+					"ls_mysql_properties_typeProperties_database": {
+						"value": "[parameters('ls_mysql_properties_typeProperties_database')]"
+					},
+					"ls_mysql_properties_typeProperties_username": {
+						"value": "[parameters('ls_mysql_properties_typeProperties_username')]"
+					},
+					"ls_sp_mysql_properties_typeProperties_server": {
+						"value": "[parameters('ls_sp_mysql_properties_typeProperties_server')]"
+					},
+					"ls_sp_mysql_properties_typeProperties_database": {
+						"value": "[parameters('ls_sp_mysql_properties_typeProperties_database')]"
+					},
+					"ls_sp_mysql_properties_typeProperties_username": {
+						"value": "[parameters('ls_sp_mysql_properties_typeProperties_username')]"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

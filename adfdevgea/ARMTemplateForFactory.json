@@ -1,0 +1,508 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adfdevgea"
+		},
+		"ls_adls_landing_mysql_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ls_adls_landing_mysql'"
+		},
+		"ls_lkp_MySql_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ls_lkp_MySql'"
+		},
+		"ls_mysql_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ls_mysql'"
+		},
+		"ls_sp_mysql_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ls_sp_mysql'"
+		},
+		"ls_ss_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_ss'"
+		},
+		"ls_adls_landing_mysql_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://sgdevgen2gea.dfs.core.windows.net/"
+		},
+		"ls_lkp_MySql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "localhost"
+		},
+		"ls_lkp_MySql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "walmart"
+		},
+		"ls_lkp_MySql_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "515137495"
+		},
+		"ls_mysql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "localhost"
+		},
+		"ls_mysql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "walmart"
+		},
+		"ls_mysql_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "515137495"
+		},
+		"ls_sp_mysql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "localhost"
+		},
+		"ls_sp_mysql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "walmart"
+		},
+		"ls_sp_mysql_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "515137495"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_fl_sql_server_mig')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "lkp_mysql_tables",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": "SELECT \n    table_schema AS `schema`,\n    table_name AS `table`\nFROM \n    information_schema.tables\nWHERE \n    table_type = 'BASE TABLE' \n    AND table_schema = 'walmart';"
+							},
+							"dataset": {
+								"referenceName": "ds_myS",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEachTables",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "lkp_mysql_tables",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('lkp_mysql_tables').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "CopyTables",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "MySqlSource",
+											"query": {
+												"value": "@{concat('select * from ',item().schema,'.',item().table)}",
+												"type": "Expression"
+											}
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "ds_mysql",
+											"type": "DatasetReference",
+											"parameters": {
+												"schema": {
+													"value": "@item().schema",
+													"type": "Expression"
+												},
+												"table": {
+													"value": "@item().table",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ds_mysqltables_parquet",
+											"type": "DatasetReference",
+											"parameters": {
+												"schema": {
+													"value": "@item().schema",
+													"type": "Expression"
+												},
+												"table": {
+													"value": "@item().table",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "sp_success",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "CopyTables",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[SP_Execution_Details]",
+										"storedProcedureParameters": {
+											"date": {
+												"value": {
+													"value": "@formatDateTime(convertTimeZone(utcnow(), 'UTC', 'India Standard Time'), 'MM/dd/yyyy hh:mm:ss tt')\n",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"error_message": {
+												"value": null,
+												"type": "String"
+											},
+											"pl_name": {
+												"value": {
+													"value": "@pipeline().Pipeline",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"pl_runId": {
+												"value": {
+													"value": "@pipeline().RunId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"pl_status": {
+												"value": "SUCCESS",
+												"type": "String"
+											},
+											"rows_copied": {
+												"value": {
+													"value": "@activity('CopyTables').output.rowsCopied",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"rows_read": {
+												"value": {
+													"value": "@activity('CopyTables').output.rowsRead",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ls_ss",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "PL_Onprem_Sql_Server"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_myS')]",
+				"[concat(variables('factoryId'), '/datasets/ds_mysql')]",
+				"[concat(variables('factoryId'), '/datasets/ds_mysqltables_parquet')]",
+				"[concat(variables('factoryId'), '/linkedServices/ls_ss')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_myS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_lkp_MySql",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "MySqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_lkp_MySql')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_mysql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_lkp_MySql",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"schema": {
+						"type": "string"
+					},
+					"table": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "MySqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_lkp_MySql')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_mysqltables_parquet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_landing_mysql",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"schema": {
+						"type": "string"
+					},
+					"table": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@concat(dataset().table,'.parquet')",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@concat(dataset().schema, '/', dataset().table)\n",
+							"type": "Expression"
+						},
+						"fileSystem": "input"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_landing_mysql')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_adls_landing_mysql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ls_adls_landing_mysql_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('ls_adls_landing_mysql_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_lkp_MySql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "MySql",
+				"typeProperties": {
+					"server": "[parameters('ls_lkp_MySql_properties_typeProperties_server')]",
+					"port": 3306,
+					"database": "[parameters('ls_lkp_MySql_properties_typeProperties_database')]",
+					"username": "[parameters('ls_lkp_MySql_properties_typeProperties_username')]",
+					"sslMode": 1,
+					"useSystemTrustStore": 0,
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('ls_lkp_MySql_password')]"
+					},
+					"driverVersion": "v2"
+				},
+				"connectVia": {
+					"referenceName": "irsqlserverop",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/irsqlserverop')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_mysql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "MySql",
+				"typeProperties": {
+					"server": "[parameters('ls_mysql_properties_typeProperties_server')]",
+					"port": 3306,
+					"database": "[parameters('ls_mysql_properties_typeProperties_database')]",
+					"username": "[parameters('ls_mysql_properties_typeProperties_username')]",
+					"sslMode": 1,
+					"useSystemTrustStore": 0,
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('ls_mysql_password')]"
+					},
+					"driverVersion": "v2"
+				},
+				"connectVia": {
+					"referenceName": "irsqlserverop",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/irsqlserverop')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_sp_mysql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "MySql",
+				"typeProperties": {
+					"server": "[parameters('ls_sp_mysql_properties_typeProperties_server')]",
+					"port": 3306,
+					"database": "[parameters('ls_sp_mysql_properties_typeProperties_database')]",
+					"username": "[parameters('ls_sp_mysql_properties_typeProperties_username')]",
+					"sslMode": 1,
+					"useSystemTrustStore": 0,
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('ls_sp_mysql_password')]"
+					},
+					"driverVersion": "v2"
+				},
+				"connectVia": {
+					"referenceName": "irsqlserverop",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/irsqlserverop')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_ss')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('ls_ss_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "irsqlserverop",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/irsqlserverop')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/irsqlserverop')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {
+					"selfContainedInteractiveAuthoringEnabled": true
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

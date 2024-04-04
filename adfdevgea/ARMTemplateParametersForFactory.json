@@ -1,0 +1,54 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adfdevgea"
+		},
+		"ls_adls_landing_mysql_accountKey": {
+			"value": ""
+		},
+		"ls_lkp_MySql_password": {
+			"value": ""
+		},
+		"ls_mysql_password": {
+			"value": ""
+		},
+		"ls_sp_mysql_password": {
+			"value": ""
+		},
+		"ls_ss_connectionString": {
+			"value": ""
+		},
+		"ls_adls_landing_mysql_properties_typeProperties_url": {
+			"value": "https://sgdevgen2gea.dfs.core.windows.net/"
+		},
+		"ls_lkp_MySql_properties_typeProperties_server": {
+			"value": "localhost"
+		},
+		"ls_lkp_MySql_properties_typeProperties_database": {
+			"value": "walmart"
+		},
+		"ls_lkp_MySql_properties_typeProperties_username": {
+			"value": "515137495"
+		},
+		"ls_mysql_properties_typeProperties_server": {
+			"value": "localhost"
+		},
+		"ls_mysql_properties_typeProperties_database": {
+			"value": "walmart"
+		},
+		"ls_mysql_properties_typeProperties_username": {
+			"value": "515137495"
+		},
+		"ls_sp_mysql_properties_typeProperties_server": {
+			"value": "localhost"
+		},
+		"ls_sp_mysql_properties_typeProperties_database": {
+			"value": "walmart"
+		},
+		"ls_sp_mysql_properties_typeProperties_username": {
+			"value": "515137495"
+		}
+	}
+}
