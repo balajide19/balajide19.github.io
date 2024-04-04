@@ -141,10 +141,10 @@
 								"storedProcedureParameters": {
 									"date": {
 										"value": {
-											"value": "@convertTimeZone(utcnow(), 'UTC', 'India Standard Time')",
+											"value": "@utcnow()",
 											"type": "Expression"
 										},
-										"type": "DateTime"
+										"type": "Datetime"
 									},
 									"error_message": {
 										"value": null,
