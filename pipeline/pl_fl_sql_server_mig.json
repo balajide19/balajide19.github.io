@@ -141,10 +141,10 @@
 								"storedProcedureParameters": {
 									"date": {
 										"value": {
-											"value": "@utcnow()",
+											"value": "@formatDateTime(convertTimeZone(utcnow(), 'UTC', 'India Standard Time'), 'MM/dd/yyyy hh:mm:ss tt')\n",
 											"type": "Expression"
 										},
-										"type": "Datetime"
+										"type": "DateTime"
 									},
 									"error_message": {
 										"value": null,
@@ -162,7 +162,7 @@
 											"value": "@pipeline().RunId",
 											"type": "Expression"
 										},
-										"type": "Int32"
+										"type": "String"
 									},
 									"pl_status": {
 										"value": "SUCCESS",
