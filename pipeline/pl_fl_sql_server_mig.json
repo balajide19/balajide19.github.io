@@ -116,6 +116,71 @@
 									}
 								}
 							]
+						},
+						{
+							"name": "sp_success",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "CopyTables",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[SP_Execution_Details]",
+								"storedProcedureParameters": {
+									"error_message": {
+										"value": null,
+										"type": "String"
+									},
+									"pl_name": {
+										"value": {
+											"value": "@pipeline().Pipeline",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pl_runId": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"pl_status": {
+										"value": "Success",
+										"type": "String"
+									},
+									"rows_copied": {
+										"value": {
+											"value": "@activity('CopyTables').output.Copied",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"rows_read": {
+										"value": {
+											"value": "@activity('CopyTables').output.rowsRead",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_ss",
+								"type": "LinkedServiceReference"
+							}
 						}
 					]
 				}
