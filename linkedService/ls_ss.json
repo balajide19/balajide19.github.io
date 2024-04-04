@@ -5,8 +5,8 @@
 		"annotations": [],
 		"type": "SqlServer",
 		"typeProperties": {
-			"connectionString": "integrated security=False;data source=BALA_DELL\\SQLEXPRESS02;initial catalog=SYS_DB;user id=RO515137495",
-			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI5YzVkNjM4Ni1jNjg2LTRmZDktYTZjYy1jNGNmNjRmMGFjNTUiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+			"connectionString": "integrated security=False;data source=BALA_DELL\\SQLEXPRESS02;initial catalog=SYS_DB;user id=admin",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiIyYThmZTk4YS0xNjVjLTQ5ZjAtODBmZC0xNGMyY2ExNTNiNjQiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
 		},
 		"connectVia": {
 			"referenceName": "irsqlserverop",
